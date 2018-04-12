@@ -58,7 +58,7 @@ class DBWNode(object):
 
         # TODO: Subscribe to all the topics you need to
 		ros.Subscriber('/twist_cmd', TwistStamped, self.twist_callback)
-		ros.Subscriber('/vehicle/dbw_enabled', Bool, self.bdw_callback)
+		ros.Subscriber('/vehicle/dbw_enabled', Bool, self.dbw_callback)
 		ros.Subscriber('/vehicle/current_velocity', TwistStamped, self.cur_vel_callback)
 		
 		self.cur_linear_vel = None
