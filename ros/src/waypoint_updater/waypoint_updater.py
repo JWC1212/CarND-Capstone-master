@@ -89,7 +89,7 @@ class WaypointUpdater(object):
 		prev_wp_coord = np.array(self.waypoints_2d[closest_wp_id-1])
 		pos_coord = np.array([x,y])
 		
-		val = np.dot(closest_wp_coord - pos_coord,prev_wp_coord - pos_coord)
+		val = np.dot(closest_wp_coord - prev_wp_coord, pos_coord - closest_wp_coord)
 		if val > 0:
 			closest_wp_id = (closest_wp_id + 1) % (len(self.waypoints_2d))
 		return closest_wp_id

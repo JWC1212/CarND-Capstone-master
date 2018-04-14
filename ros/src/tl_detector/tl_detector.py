@@ -103,7 +103,7 @@ class TLDetector(object):
         #TODO implement
 		pos_x = pose.position.x
 		pos_y = pose.position.y
-		dist = [pos_x*self.waypoints.waypoints[i].pose.pose.position.x + pos_y*self.waypoints.waypoints[i].pose.pose.position.y for i in range(len(self.waypoints.waypoints))]
+		dist = [(pos_x-self.waypoints.waypoints[i].pose.pose.position.x)**2 + (pos_y-self.waypoints.waypoints[i].pose.pose.position.y)**2 for i in range(len(self.waypoints.waypoints))]
         closest_wp_id = dist.index(min(dist))
 		if closest_wp_id == 0:
 			return 0
@@ -111,7 +111,7 @@ class TLDetector(object):
 		clst_wp_y = waypoints.waypoints[closest_wp_id].pose.pose.position.y
 		prev_clst_wp_x = waypoints.waypoints[closest_wp_id-1].pose.pose.position.x
 		prev_clst_wp_y = waypoints.waypoints[closest_wp_id-1].pose.pose.position.y
-		
+        #Find the closest waypoint
 		if (clst_wp_x-prev_clst_wp_x)*(pos_x - clst_wp_x) + (clst_wp_y-prev_clst_wp_y)*(pos_y-clst_wp_y)>0:
 			closest_wp_id = (closest_wp_id + 1) % len(self.waypoints)
 		return closest_wp_id
@@ -166,7 +166,7 @@ class TLDetector(object):
 			if (clst_light_pos[0]-prev_light_pos[0])*(self.pose.pose.position.x-clst_light_pos[0]) + (clst_light_pos[1]-prev_light_pos[1)*(self.pose.pose.position.y-clst_light_pos[1])>0:
 				clst_light_id = (clst_light_id + 1) % len(self.lights)
 		
-		light = self.lights.lights[clst_light_id]	#get closest traffic light to vehicle.
+		light = self.lights.lights[clst_light_id]	#get closest traffic light to vehicle ahead.
 		
         if light:
             state = self.get_light_state(light)
