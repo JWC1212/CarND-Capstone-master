@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
+from std_msgs.msg import Int32
 from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
 from scipy.spatial import KDTree
@@ -22,7 +23,8 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
-
+TARGET_SPEED = 20 #Unit MPH
+ONE_MPH = 0.44704 #1 MPH = 0.44704 m/s
 
 class WaypointUpdater(object):
     def __init__(self):
@@ -32,7 +34,7 @@ class WaypointUpdater(object):
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
-		rospy.Subscriber('/traffic_waypoint', PoseStamped, self.traffic_cb)
+		rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
 		rospy.Subscriber('/obstacle_waypoint', PoseStamped, self.obstacle_cb)
 
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
@@ -89,7 +91,7 @@ class WaypointUpdater(object):
 		prev_wp_coord = np.array(self.waypoints_2d[closest_wp_id-1])
 		pos_coord = np.array([x,y])
 		
-		val = np.dot(closest_wp_coord - prev_wp_coord, pos_coord - closest_wp_coord)
+		val = np.dot(closest_wp_coord - prev_wp_coord,pos_coord - closest_wp_coord)
 		if val > 0:
 			closest_wp_id = (closest_wp_id + 1) % (len(self.waypoints_2d))
 		return closest_wp_id
@@ -98,6 +100,12 @@ class WaypointUpdater(object):
 		lane = Lane()
 		lane.header = self.base_waypoints.header
 		lane.waypoints = self.base_waypoints.waypoints[closest_idx:closest_idx+LOOKAHEAD_WPS]
+		
+		for i in range(len(lane.waypoints)):
+			self.set_waypoint_velocity(lane.waypoints,i,TARGET_SPEED*ONE_MPH)
+			
+		if (self.traffic_wp >= 0) and (closest_idx <= self.traffic_wp < closest_id+LOOKAHEAD_WPS):
+			self.set_waypoint_velocity(lane.waypoints,self.traffic_wp,0.0)
 		self.final_waypoints_pub.publish(lane)
 	
 	def loop(self):
