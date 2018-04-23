@@ -11,8 +11,8 @@ class TLClassifier(object):
         self.graph = tf.Graph()
         #set the graph as default graph
 		with self.graph.as_default():
-            temp_graph_def = tf.GraphDef() #setup a temporary graph to contain default graph
 			with tf.gfile.GFile(Model_Path, 'rb') as f:
+                temp_graph_def = tf.GraphDef() #setup a temporary graph to contain default graph
 				temp_graph_def.ParseFromString(f.read())
 				tf.import_graph_def(temp_graph_def, name='')
 			self.input_image = self.graph.get_tensor_by_name('image_tensor:0')
