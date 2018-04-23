@@ -57,9 +57,9 @@ class DBWNode(object):
         self.controller = Controller(vehicle_mass,fuel_capacity,brake_deadband,decel_limit,accel_limit,wheel_radius,wheel_base,steer_ratio,max_lat_accel,max_steer_angle)
 
         # TODO: Subscribe to all the topics you need to
-		ros.Subscriber('/twist_cmd', TwistStamped, self.twist_callback)
-		ros.Subscriber('/vehicle/dbw_enabled', Bool, self.dbw_callback)
-		ros.Subscriber('/vehicle/current_velocity', TwistStamped, self.cur_vel_callback)
+		rospy.Subscriber('/twist_cmd', TwistStamped, self.twist_callback)
+		rospy.Subscriber('/vehicle/dbw_enabled', Bool, self.dbw_callback)
+		rospy.Subscriber('/vehicle/current_velocity', TwistStamped, self.cur_vel_callback)
 		
 		self.cur_linear_vel = None
 		self.cur_angular_vel = None
@@ -84,7 +84,7 @@ class DBWNode(object):
                self.publish(self.throttle, self.brake, self.steering)
             rate.sleep()
 	
-	def bdw_callback(self, msg):
+	def dbw_callback(self, msg):
 		self.dbw_enable = msg.data
 		
 	def twist_callback(self, msg):

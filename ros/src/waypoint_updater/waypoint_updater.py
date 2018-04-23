@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
+from std_msgs.msg import Int32
 from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
 from scipy.spatial import KDTree
@@ -22,7 +23,8 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
-
+TARGET_SPEED = 20 # Unit MPH
+ONE_MPH = 0.44704 # 1MPH = 0.44707m/s
 
 class WaypointUpdater(object):
     def __init__(self):
@@ -32,7 +34,7 @@ class WaypointUpdater(object):
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
-		rospy.Subscriber('/traffic_waypoint', PoseStamped, self.traffic_cb)
+		rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb)
 		rospy.Subscriber('/obstacle_waypoint', PoseStamped, self.obstacle_cb)
 
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
@@ -98,6 +100,17 @@ class WaypointUpdater(object):
 		lane = Lane()
 		lane.header = self.base_waypoints.header
 		lane.waypoints = self.base_waypoints.waypoints[closest_idx:closest_idx+LOOKAHEAD_WPS]
+        #In the planning path red light is detected.
+        if self.traffic_wp >= 0:
+            offset = self.traffic_wp - closest_idx
+            if 0 < offset < LOOKAHEAD_WPS:
+                for i in range(offset):
+                    lane.waypoints[i+1].twist.twist.linear.x = lane.waypoints[0].twist.twist.linear.x*(1- (i+1)/offset)
+                for i in range(offset, LOOKAHEAD_WPS-1):
+                    lane.waypoints[i+1].twist.twist.linear.x = (i-offset+1)*(lane.waypoints[LOOKAHEAD_WPS-1].twist.twist.linear.x)/(LOOKAHEAD_WPS-offset-1)
+            elif offset ==0:
+                lane.waypoints[offset].twist.twist.linear.x = 0.0
+
 		self.final_waypoints_pub.publish(lane)
 	
 	def loop(self):
