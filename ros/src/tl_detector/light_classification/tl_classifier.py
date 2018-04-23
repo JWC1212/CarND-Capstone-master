@@ -10,18 +10,18 @@ class TLClassifier(object):
         #setup a new graph
         self.graph = tf.Graph()
         #set the graph as default graph
-		with self.graph.as_default():
+	with self.graph.as_default():
             temp_graph_def = tf.GraphDef() #setup a temporary graph to contain default graph
-			with tf.gfile.GFile(Model_Path, 'rb') as f:
-				temp_graph_def.ParseFromString(f.read())
-				tf.import_graph_def(temp_graph_def, name='')
-			self.input_image = self.graph.get_tensor_by_name('image_tensor:0')
-			self.boxes = self.graph.get_tensor_by_name('detection_boxes:0')
-			self.scores = self.graph.get_tensor_by_name('detection_scores:0')
-			self.classes = self.graph.get_tensor_by_name('detection_classes:0')
-			self.detections = self.graph.get_tensor_by_name('num_detections:0')
+	    with tf.gfile.GFile(Model_Path, 'rb') as f:
+		temp_graph_def.ParseFromString(f.read())
+		tf.import_graph_def(temp_graph_def, name='')
+	    self.input_image = self.graph.get_tensor_by_name('image_tensor:0')
+	    self.boxes = self.graph.get_tensor_by_name('detection_boxes:0')
+	    self.scores = self.graph.get_tensor_by_name('detection_scores:0')
+	    self.classes = self.graph.get_tensor_by_name('detection_classes:0')
+	    self.detections = self.graph.get_tensor_by_name('num_detections:0')
 		
-		self.sess = tf.Session(graph=self.graph)
+	self.sess = tf.Session(graph=self.graph)
 			
 
     def get_classification(self, image):
@@ -35,21 +35,21 @@ class TLClassifier(object):
 
         """
         #TODO implement light color prediction
-		with self.graph.as_default():
-			input_expand = np.expand_dims(image, axis=0) #input tensor placeholder has shape like [None, height, width, 3]
-			boxes, scores, classes, detections = self.sess.run([self.boxes,self.scores,self.classes,self.detections], feed_dict={self.input_image:input_expand})
+	with self.graph.as_default():
+		input_expand = np.expand_dims(image, axis=0) #input tensor placeholder has shape like [None, height, width, 3]
+		boxes, scores, classes, detections = self.sess.run([self.boxes,self.scores,self.classes,self.detections], feed_dict={self.input_image:input_expand})
 		
-		boxes = np.squeeze(boxes)
-		scores = np.squeeze(scores)
-		classes = np.squeeze(classes).astype(np.int32)
+	boxes = np.squeeze(boxes)
+	scores = np.squeeze(scores)
+	classes = np.squeeze(classes).astype(np.int32)
 		
-		if scores[0] > 0.5:
-			if classes[0] == 1:
-				return TrafficLight.GREEN
-			elif classes[0] == 2:
-				return TrafficLight.RED
-			elif classes[0] == 3:
-				return TrafficLight.YELLOW
-			else:
-				return TrafficLight.UNKNOWN
+	if scores[0] > 0.5:
+		if classes[0] == 1:
+			return TrafficLight.GREEN
+		elif classes[0] == 2:
+			return TrafficLight.RED
+		elif classes[0] == 3:
+			return TrafficLight.YELLOW
+		else:
+			return TrafficLight.UNKNOWN
         return TrafficLight.UNKNOWN
