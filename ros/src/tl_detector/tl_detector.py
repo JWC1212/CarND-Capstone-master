@@ -12,7 +12,11 @@ import cv2
 import yaml
 
 STATE_COUNT_THRESHOLD = 3
+<<<<<<< HEAD
 DISTANCE_TO_LIGHT = 50.0
+=======
+LOOKAHEAD_WPS = 200
+>>>>>>> origin/master
 
 class TLDetector(object):
     def __init__(self):
@@ -52,16 +56,16 @@ class TLDetector(object):
 
         rospy.spin()
 
-    def pose_cb(self, msg):
+	def pose_cb(self, msg):
         self.pose = msg
-
-    def waypoints_cb(self, waypoints):
+		
+	def waypoints_cb(self, waypoints):
         self.waypoints = waypoints
 
-    def traffic_cb(self, msg):
-        self.lights = msg.lights
+	def traffic_cb(self, msg):
+		self.lights = msg.lights
 
-    def image_cb(self, msg):
+	def image_cb(self, msg):
         """Identifies red lights in the incoming camera image and publishes the index
             of the waypoint closest to the red light's stop line to /traffic_waypoint
 
@@ -102,18 +106,30 @@ class TLDetector(object):
 
         """
         #TODO implement
-		pos_x = pose.position.x
-		pos_y = pose.position.y
-		dist = [(pos_x-self.waypoints.waypoints[i].pose.pose.position.x)**2 + (pos_y-self.waypoints.waypoints[i].pose.pose.position.y)**2 for i in range(len(self.waypoints.waypoints))]
+		pos_x = pose.position.x	#current car position
+		pos_y = pose.position.y	#current car position
+		
+		num_wp = len(self.waypoints.waypoints)
+		
+		dist = [pos_x*self.waypoints.waypoints[i].pose.pose.position.x + pos_y*self.waypoints.waypoints[i].pose.pose.position.y for i in range(num_wp)]
         closest_wp_id = dist.index(min(dist))
+<<<<<<< HEAD
 		if closest_wp_id == 0:
 			return 0
+=======
+
+>>>>>>> origin/master
 		clst_wp_x = self.waypoints.waypoints[closest_wp_id].pose.pose.position.x
 		clst_wp_y = self.waypoints.waypoints[closest_wp_id].pose.pose.position.y
 		prev_clst_wp_x = self.waypoints.waypoints[closest_wp_id-1].pose.pose.position.x
 		prev_clst_wp_y = self.waypoints.waypoints[closest_wp_id-1].pose.pose.position.y
+<<<<<<< HEAD
         #Find the closest waypoint ahead
 		if (clst_wp_x-prev_clst_wp_x)*(pos_x - clst_wp_x) + (clst_wp_y-prev_clst_wp_y)*(pos_y-clst_wp_y) > 0:
+=======
+		
+		if (clst_wp_x-prev_clst_wp_x)*(pos_x - clst_wp_x) + (clst_wp_y-prev_clst_wp_y)*(pos_y-clst_wp_y)>0:
+>>>>>>> origin/master
 			closest_wp_id = (closest_wp_id + 1) % len(self.waypoints.waypoints)
 		return closest_wp_id
 
@@ -126,7 +142,7 @@ class TLDetector(object):
         Returns:
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
-        """
+        
         if(not self.has_image):
             self.prev_light_loc = None
             return False
@@ -135,7 +151,9 @@ class TLDetector(object):
 
         #Get classification
         return self.light_classifier.get_classification(cv_image)
-
+		"""
+		return light.state
+		
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
             location and color
@@ -154,6 +172,7 @@ class TLDetector(object):
 
         #TODO find the closest visible traffic light (if one exists)
 		
+<<<<<<< HEAD
 		#list of light position (x, y)
 		light_positions =  [(self.lights[i].pose.pose.position.x, self.lights[i].pose.pose.position.y) for i in range(len(self.lights))]
 		#list of distance between car position and each light position
@@ -178,6 +197,27 @@ class TLDetector(object):
             return light_wp, state
         
         return -1, TrafficLight.UNKNOWN
+=======
+		#Generate a list of closest waypoints ahead ID for traffice light
+		clst_wp_toTL = [self.get_closest_waypoint(self.lights[i].pose.pose) for i in range(len(self.lights))]
+		#Generate a list of distance from car wp id to each light wp id
+		OFFSET_list = [1000000 if wp_t1-car_position < 0 else wp_tl-car_position for wp_t1 in clst_wp_toTL]
+		#Find which traffic light is now visible and closest to car.
+		light_id = OFFSET_list.index(min(OFFSET_list))		
+		ID_clstWP_toTL = clst_wp_toTL[light_id]
+		#Find closest traffic light to car.
+		light = self.lights[light_id]
+		
+		if light:
+			state = self.get_light_state(light)
+			stop_line_pos = Pose()
+			stop_line_pos.position.x = stop_line_positions[light_id][0]
+			stop_line_pos.position.y = stop_line_positions[light_id][1]
+			if (car_position<=ID_clstWP_toTL<car_position+LOOKAHEAD_WPS)
+				light_wp = self.get_closest_waypoint(stop_line_pos)-1
+			return light_wp, state
+		return -1, TrafficLight.UNKNOWN
+>>>>>>> origin/master
 
 if __name__ == '__main__':
     try:

@@ -25,6 +25,7 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
 TARGET_SPEED = 20 # Unit MPH
 ONE_MPH = 0.44704 # 1MPH = 0.44707m/s
+MAX_DECEL = 0.5
 
 class WaypointUpdater(object):
     def __init__(self):
@@ -45,9 +46,8 @@ class WaypointUpdater(object):
 		self.base_waypoints = None
 		self.waypoint_tree = None
 		
-        rospy.spin()
-		
 		self.loop()
+        rospy.spin()
     
 	def pose_cb(self, msg):
         # TODO: Implement
@@ -91,7 +91,7 @@ class WaypointUpdater(object):
 		prev_wp_coord = np.array(self.waypoints_2d[closest_wp_id-1])
 		pos_coord = np.array([x,y])
 		
-		val = np.dot(closest_wp_coord - prev_wp_coord, pos_coord - closest_wp_coord)
+		val = np.dot(closest_wp_coord - prev_wp_coord,pos_coord - closest_wp_coord)
 		if val > 0:
 			closest_wp_id = (closest_wp_id + 1) % (len(self.waypoints_2d))
 		return closest_wp_id
@@ -103,13 +103,17 @@ class WaypointUpdater(object):
         #In the planning path red light is detected.
         if self.traffic_wp >= 0:
             offset = self.traffic_wp - closest_idx
-            if 0 < offset < LOOKAHEAD_WPS:
-                for i in range(offset):
-                    lane.waypoints[i+1].twist.twist.linear.x = lane.waypoints[0].twist.twist.linear.x*(1- (i+1)/offset)
-                for i in range(offset, LOOKAHEAD_WPS-1):
-                    lane.waypoints[i+1].twist.twist.linear.x = (i-offset+1)*(lane.waypoints[LOOKAHEAD_WPS-1].twist.twist.linear.x)/(LOOKAHEAD_WPS-offset-1)
-            elif offset ==0:
-                lane.waypoints[offset].twist.twist.linear.x = 0.0
+            for i, waypoint in enumerate(lane.waypoints):
+                dist = self.distance(lane.waypoints, i, offset)
+                if i >= offset:
+                    pred_speed = 0.0
+                elif distance < 15:
+                    pred_speed = math.sqrt(2 * MAX_DECEL * dist)
+                    if pred_speed <= 1:
+                        pred_speed = 0.0
+                    pred_speed = min(pred_speed, self.get_waypoint_velocity(waypoint))
+
+                lane.waypoints[i].twist.twist.linear.x = pred_speed
 
 		self.final_waypoints_pub.publish(lane)
 	
