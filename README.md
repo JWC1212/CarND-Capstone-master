@@ -13,7 +13,7 @@ This self-driving car software system consists of three modules:
 2. Planning module which is responsible for generating predicted waypoints the car will follow then sending to controller
 3. Control module which uses PID controller to adjust the car's throttle, brake and steering angle to follow predicted waypoints.
 
-[./]
+[./imgs/System-Architecture.png]
 
 Please use **one** of the two installation options, either native **or** docker installation.
 
