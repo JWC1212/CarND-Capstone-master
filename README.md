@@ -16,7 +16,7 @@ This self-driving car software system consists of three modules:
 3. Control module which uses PID controller to set the car's throttle, brake and steering angle
 
 [image1]: ./imgs/System-Architecture.png "System Architecture"
-
+![alt text][image1]
 
 Please use **one** of the two installation options, either native **or** docker installation.
 
