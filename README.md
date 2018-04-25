@@ -1,19 +1,22 @@
 This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
 
 ### Project-ego-car Team member
-Hao Wu                         jonathenwu@hotmail.com
-Johannes Schniertshauer
-Pranav Konduru
-Qi Fu
-Wajid Khattak
+|  Name                                   | Udacity Account Email Address     |
+|:---------------------------------------:|:---------------------------------:|
+| Hao Wu                                  |   jonathenwu@hotmail.com          |
+| Johannes Schniertshauer                 |                                   |
+| Pranav Konduru                          |                                   |
+| Qi Fu                                   |                                   |
+| Wajid Khattak                           |                                   |
 
 ### System Overview
 This self-driving car software system consists of three modules:
 1. Perception module which is actually a traffic light detector publishing traffic light information to planning module
 2. Planning module which is responsible for generating predicted waypoints the car will follow then sending to controller
-3. Control module which uses PID controller to adjust the car's throttle, brake and steering angle to follow predicted waypoints.
-[]
-(./imgs/System-Architecture.png)
+3. Control module which uses PID controller to set the car's throttle, brake and steering angle
+
+[image1]: ./imgs/System-Architecture.png "System Architecture"
+
 
 Please use **one** of the two installation options, either native **or** docker installation.
 
