@@ -4,10 +4,10 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 |  Name                                   | Udacity Account Email Address     |
 |:---------------------------------------:|:---------------------------------:|
 | Hao Wu                                  |   jonathenwu@hotmail.com          |
-| Johannes Schniertshauer                 |                                   |
-| Pranav Konduru                          |                                   |
-| Qi Fu                                   |                                   |
-| Wajid Khattak                           |                                   |
+| Johannes Schniertshauer                 |   johannes.wfi@gmail.com          |
+| Pranav Konduru                          |   k.pranav.kumar@gmail.com        |
+| Qi Fu                                   |   cherolfu@gmail.com              |
+| Wajid Khattak                           |   khattakwajid@hotmail.com        |
 
 ### System Overview
 This self-driving car software system consists of three modules:
